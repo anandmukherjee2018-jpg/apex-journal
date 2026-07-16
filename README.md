@@ -27,6 +27,8 @@ The honest summary of those numbers: the system has a statistically significant 
 
 ## Timeline
 
+**2026-07-15** — Journal published on GitHub. Code repo (private) pushed as off-machine backup.
+
 **2026-07-14** — Started this public journal. Fixed a daily-automation bug where the price refresh skipped nearly all tickers every other day.
 
 **2026-07-04 — Validation hardening.** Prompted by an honest audit ("will it actually make money?"):
@@ -44,15 +46,21 @@ The honest summary of those numbers: the system has a statistically significant 
 
 **2026-05-30 — Institutional techniques: all dropped.** Regime-adaptive signal weights (overfits), dollar-neutral long/short (shorting weak S&P names bleeds in a bull market: +447% → +47%), and factor orthogonalization (removes exactly the shared momentum component that *is* the alpha: +447% → +44%). Core finding: **APEX's edge is a concentrated bet on the momentum factor — techniques that diversify, hedge, or decorrelate destroy it.**
 
-**2026-05-24 — Survivorship bias corrected.** Integrated historical S&P 500 membership (per-period universe filter + price histories of ~94 removed members). Impact was brutal: the base variant's cumulative return fell from +247% to +82%. The 2020–2022 numbers had been heavily inflated. Every result since is survivorship-corrected.
+**2026-05-24 — Survivorship bias corrected.** Integrated historical S&P 500 membership (per-period universe filter + price histories of ~94 removed members). Impact was brutal: the base variant's cumulative return fell from +247% to +82%. The 2020–2022 numbers had been heavily inflated. Every result since is survivorship-corrected. Same day: archived nine legacy research scripts and re-ran the full validation suite on the corrected universe — the clean-window edge survived; the full-window p-value honestly reported as *not* significant at 5% (p=0.061).
 
-**2026-05-15 / 05-16 — Parameter sweeps.** Position caps, pick counts, breadth thresholds, score exponents, volatility targeting, and three academic signals (idiosyncratic vol, short-term reversal, residual momentum). Vol targeting's lesson generalized: momentum's best periods are its highest-vol periods, so anything that trims volatility trims exactly the return. Settled on uncapped score-proportional sizing with 10/6/3 picks per regime.
+**2026-05-22 — Measurement honesty fixes.** Three subtle bugs found in one sweep: the IC measurement used pooled correlation instead of the standard mean-of-period-ICs methodology (fixed); the live picks section had a dropped filter still hardcoded on, silently reducing production picks from 6 to 4 (fixed); and one stock showing a +1,000% momentum input was investigated as a suspected data artifact — it turned out to be *real* (a genuine 10x optical-networking runner), and the "safety cap" I nearly added would have distorted the signal ranking. Lesson: verify before patching.
 
-**2026-05-01 — Debiased validation.** Out-of-sample test with signal weights derived only from in-sample data: still significant (p=0.018). Added drawdown email alerts and a position-cap variant.
+**2026-05-15 / 05-16 — Parameter sweeps.** Position caps, pick counts, breadth thresholds, score exponents, volatility targeting, and three academic signals (idiosyncratic volatility, short-term reversal, residual momentum — all with published support, all dropped: each improved Sharpe but cost cumulative return). Vol targeting's lesson generalized: momentum's best periods are its highest-vol periods, so anything that trims volatility trims exactly the return. Settled on uncapped score-proportional sizing with 10/6/3 picks per regime.
 
-**2026-04-28 — Signal recalibration.** Re-measured all signal ICs; dropped one signal (6-month Sharpe) for negative predictive power. First full Monte Carlo validation: p=0.007 vs 10,000 random portfolios.
+**2026-05-01 — Debiased validation.** The headline p-value used signal weights calibrated on overlapping data, so I added a debiased test: weights derived only from in-sample history, evaluated only on out-of-sample periods. Still significant (p=0.02). Also added automated drawdown email alerts and put the codebase under version control.
 
-**Early 2026 — Foundations.** Started from pure 12-month momentum (measured rank IC +0.12), grew to a 17-variant ablation framework over 7 price signals, of which only 4 earned a place in the composite. Built the data layer: price caches immune to cloud-sync corruption, fundamentals from Polygon, historical constituent handling.
+**2026-04-28 — Signal recalibration + first validation.** Re-measured all signal ICs on accumulated observations; dropped one signal (6-month Sharpe) for negative predictive power. First full Monte Carlo validation: p=0.007 vs 10,000 random same-size portfolios, permutation test p=0.015. Paper-trading portfolio created to track picks forward.
+
+**2026-04-24 — First production bug.** Discovered the live picks had been generated with the wrong signal-weight set (an experimental config instead of the validated one) — the corrected weights changed the picks substantially. The first of many lessons that the gap between "backtest is right" and "what actually runs is right" is where systems fail.
+
+**2026-04-19 — Fundamental data accumulation begins.** First fundamentals snapshot synced; a scheduled daily sync has been building a point-in-time fundamental panel since (avoiding the look-ahead bias of applying today's fundamentals to the past).
+
+**Late 2025 → early 2026 — Inception and foundations.** The project started as a series of research scripts asking one question: do price-based signals carry a real, measurable edge? Pure 12-month momentum measured a rank IC of +0.12 — enough to keep going. From there: risk-adjusted multi-timeframe momentum, a two-factor grid search with train/test splits, momentum IC broken down by market regime, and a 4-signal "quantitative momentum" composite with a 200-day-MA filter. An early walk-forward backtester from this era was later recognized as look-ahead biased and demoted to a sanity-check tool. Infrastructure grew alongside: fundamentals synced from a market-data API into SQLite, price caches (including a fight with cloud-sync silently reverting data files, solved by moving caches out of the synced folder), and eventually a 17-variant ablation framework over 7 price signals — of which only 4 earned a place in the final composite.
 
 ---
 
