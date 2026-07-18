@@ -27,6 +27,8 @@ The honest summary of those numbers: the system has a statistically significant 
 
 ## Timeline
 
+**2026-07-18 — Options overlay: dropped, decisively.** Tested the obvious "why not amplify the edge with options?" idea: replace each period's stock picks with 1-month call options (ATM and deep in-the-money), plus optional SPY puts during cash regimes. No historical options-chain data exists, so pricing was synthetic Black-Scholes on trailing realized volatility — **deliberately optimistic** (no volatility risk premium, no bid/ask spread, no liquidity limits), with the rule agreed up front: a fail under generous pricing kills the idea cheaply; even a pass would only justify buying real implied-vol data. It failed. Every ATM configuration lost 100% cumulatively on both test windows — a third of all periods lost over half the capital, because one-month calls on high-volatility momentum names carry premiums so large the strategy's average per-period edge can't outrun the bleed. The single deep-ITM configuration that beat stock on the clean window (and only under the impossible assumption that implied vol equals realized) still lost badly on the full window, with a −77% worst period. Bear-regime SPY puts made every variant worse. Same lesson as shorting and vol-targeting: the edge lives in patient, fully-exposed stock ownership — anything that adds theta, drag, or insurance premium destroys it.
+
 **2026-07-15** — Journal published on GitHub. Code repo (private) pushed as off-machine backup.
 
 **2026-07-14** — Started this public journal. Fixed a daily-automation bug where the price refresh skipped nearly all tickers every other day.
